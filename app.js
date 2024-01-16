@@ -161,6 +161,7 @@ const app = express();
 const port = 3000;
 
 // Enable CORS
+// Enable CORS
 app.use(cors());
 const corsOptions = {
   origin: 'http://localhost:3000', // Replace with your React app's origin
@@ -169,7 +170,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Connect to MongoDB Atlas
-const atlasConnectionUri = 'mongodb+srv://prathappoojari607:3WrebKuwJ1OIS5KU@cluster0.qhn2yup.mongodb.net/spk?retryWrites=true&w=majority';;
+const atlasConnectionUri = 'mongodb+srv://prathappoojari607:3WrebKuwJ1OIS5KU@cluster0.qhn2yup.mongodb.net/mynewdb?retryWrites=true&w=majority';;
 mongoose.connect(atlasConnectionUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB Atlas');
@@ -238,6 +239,26 @@ app.get('/forms', async (req, res) => {
     res.json(forms);
   } catch (error) {
     console.error('Error fetching all forms:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Add a DELETE route in your Express server
+app.delete('/forms/:id', async (req, res) => {
+  try {
+    const formId = req.params.id;
+
+    // Validate formId (optional)
+    if (!mongoose.Types.ObjectId.isValid(formId)) {
+      return res.status(400).json({ error: 'Invalid form ID' });
+    }
+
+    // Delete the form
+    await Form.findByIdAndDelete(formId);
+
+    res.status(204).send(); // Successful deletion, no content
+  } catch (error) {
+    console.error('Error deleting form:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
